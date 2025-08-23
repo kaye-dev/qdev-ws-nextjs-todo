@@ -1,62 +1,63 @@
-# Technology Stack
+# 技術スタック
 
-## Framework & Runtime
+## フレームワーク & ランタイム
 
-- **Next.js 15.4.6** - React framework with App Router
-- **React 19.1.0** - UI library with latest features
-- **TypeScript 5** - Type-safe JavaScript with strict mode enabled
-- **Node.js** - Runtime environment
+- **Next.js 15.4.6** - App Routerを使用したReactフレームワーク
+- **React 19.1.0** - UIライブラリ
+- **TypeScript 5** - 型安全なJavaScript
+- **Node.js** - ランタイム環境
 
-## Styling & UI
+## スタイリング & UI
 
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **PostCSS** - CSS processing
-- **Dark/Light mode** - Built-in theme switching
-- **Responsive design** - Mobile-first approach
+- **Tailwind CSS 4** - ユーティリティファーストCSSフレームワーク
+- **PostCSS** - CSS処理
+- **Geist Font** - `next/font`経由でのVercelの最適化フォントファミリー
 
-## Testing
+## テスト
 
-- **Jest 30** - Testing framework
-- **Testing Library** - React component testing utilities
-- **jsdom** - DOM environment for tests
-- **Coverage reporting** - Built-in coverage collection
+- **Jest 30** - テストフレームワーク
+- **@testing-library/react** - Reactコンポーネントテストユーティリティ
+- **@testing-library/jest-dom** - カスタムJestマッチャー
+- **@testing-library/user-event** - ユーザーインタラクションシミュレーション
+- **jsdom** - テスト用DOM環境
 
-## Development Tools
+## 開発ツール
 
-- **ESLint 9** - Code linting with Next.js config
-- **Turbopack** - Fast bundler for development
-- **TypeScript strict mode** - Enhanced type checking
+- **ESLint 9** - Next.js設定でのコードリンティング
+- **TypeScript** - 静的型チェック
+- **Turbopack** - 開発用高速バンドラー
 
-## Common Commands
+## 共通コマンド
 
-### Development
-
-```bash
-npm run dev          # Start development server with Turbopack
-npm run build        # Build for production
-npm run start        # Start production server
-```
-
-### Testing
+### 開発
 
 ```bash
-npm test             # Run all tests
-npm run test:watch   # Run tests in watch mode
-npm run test:coverage # Run tests with coverage report
+npm run dev          # Turbopackで開発サーバー起動
+npm run build        # 本番用ビルド
+npm start           # 本番サーバー起動
+npm run lint        # ESLint実行
 ```
 
-### Code Quality
+### テスト
 
 ```bash
-npm run lint         # Run ESLint
+npm test            # テスト一回実行
+npm run test:watch  # ウォッチモードでテスト実行
+npm run test:coverage # カバレッジレポート付きテスト実行
 ```
 
-## Path Aliases
+### パッケージ管理
 
-- `@/*` maps to `./src/*` for clean imports
+```bash
+npm install         # 依存関係インストール
+npm ci             # ロックファイルからクリーンインストール
+```
 
-## Build Configuration
+## 設定ファイル
 
-- Incremental TypeScript compilation enabled
-- ES2017 target for broad browser support
-- Module bundler resolution for modern imports
+- `next.config.ts` - Next.js設定
+- `tsconfig.json` - パスマッピング付きTypeScript設定（`@/*` → `./src/*`）
+- `jest.config.js` - Jestテスト設定
+- `jest.setup.js` - モック付きテスト環境セットアップ
+- `eslint.config.mjs` - ESLint設定
+- `postcss.config.mjs` - PostCSS設定

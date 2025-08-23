@@ -1,26 +1,29 @@
-# Product Overview
+# プロダクト概要
 
-## Simple Todo App
+## シンプルTodoアプリ
 
-A clean, responsive todo application built with Next.js that allows users to manage their daily tasks efficiently.
+Next.jsベースのTodoアプリケーションで、ワークショップのサンプルアプリケーションとして設計されています。これはデモンストレーション用プロジェクトであり、ビジネス利用は避けてください。
 
-### Core Features
+### 主要機能
 
-- Add new tasks with validation (max 200 characters, no duplicates)
-- Toggle task completion status
-- Delete tasks
-- Persistent storage using localStorage
-- Progress tracking with visual indicators
-- Responsive design with dark/light mode support
+- Todoアイテムの追加、完了切り替え、削除
+- ローカルストレージでの永続化
+- ダーク/ライトテーマサポート
+- モバイルファーストのレスポンシブデザイン
+- アクセシビリティ機能（ARIAラベル、キーボードナビゲーション）
+- 視覚的インジケーターによる進捗追跡
+- 日本語インターフェース
 
-### User Experience
+### デプロイメント対象
 
-- Bilingual interface (English/Japanese)
-- Accessibility-first design with ARIA labels and semantic HTML
-- Smooth animations and transitions
-- Mobile-responsive layout
-- Loading states and error handling
+- AWS ECS Fargateデプロイメント
+- アーキテクチャ: CloudFront → ALB → ECS Fargate → DynamoDB
+- コンテナ化されたNext.jsアプリケーション
 
-### Target Users
+### ユーザーエクスペリエンス
 
-Individuals looking for a simple, distraction-free task management tool that works offline and syncs data locally.
+- Tailwind CSSによるクリーンでモダンなインターフェース
+- スムーズなアニメーションとトランジション
+- ローディング状態とエラーハンドリング
+- 完了率による進捗の視覚化
+- バイリンガルサポート（英語/日本語）

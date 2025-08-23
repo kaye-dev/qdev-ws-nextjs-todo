@@ -1,71 +1,79 @@
-# Project Structure
+# プロジェクト構造
 
-## Directory Organization
+## ディレクトリ構成
 
 ```
 src/
 ├── app/                    # Next.js App Router
-│   ├── layout.tsx         # Root layout with metadata
-│   ├── page.tsx           # Home page component
-│   └── globals.css        # Global styles and CSS variables
-├── components/            # Reusable React components
-│   ├── TodoApp.tsx        # Main application container
-│   ├── TodoForm.tsx       # Task input form
-│   ├── TodoList.tsx       # Task list container
-│   ├── TodoItem.tsx       # Individual task component
-│   ├── EmptyState.tsx     # Empty state display
-│   └── __tests__/         # Component tests
-├── types/                 # TypeScript type definitions
-│   ├── index.ts           # Re-exports
-│   └── todo.ts            # Todo-related types and interfaces
-└── utils/                 # Utility functions
-    ├── index.ts           # Re-exports
-    ├── storage.ts         # localStorage operations
-    ├── uuid.ts            # UUID generation
-    ├── validation.ts      # Input validation
-    └── __tests__/         # Utility tests
+│   ├── __tests__/         # アプリレベルテスト
+│   ├── globals.css        # グローバルスタイル
+│   ├── layout.tsx         # ルートレイアウトコンポーネント
+│   └── page.tsx           # ホームページコンポーネント
+├── components/            # 再利用可能UIコンポーネント
+│   ├── __tests__/         # コンポーネントテスト
+│   ├── EmptyState.tsx     # 空状態表示
+│   ├── ThemeProvider.tsx  # テーマコンテキストプロバイダー
+│   ├── ThemeToggle.tsx    # テーマ切り替えコンポーネント
+│   ├── TodoApp.tsx        # メインTodoアプリケーション
+│   ├── TodoForm.tsx       # Todo入力フォーム
+│   ├── TodoItem.tsx       # 個別Todoアイテム
+│   └── TodoList.tsx       # Todoアイテムコンテナ
+├── hooks/                 # カスタムReactフック
+│   ├── __tests__/         # フックテスト
+│   ├── index.ts           # フックエクスポート
+│   └── useTheme.ts        # テーマ管理フック
+├── types/                 # TypeScript型定義
+│   ├── index.ts           # 型エクスポート
+│   ├── theme.ts           # テーマ関連型
+│   └── todo.ts            # Todo関連型
+└── utils/                 # ユーティリティ関数
+    ├── __tests__/         # ユーティリティテスト
+    ├── index.ts           # ユーティリティエクスポート
+    ├── storage.ts         # localStorage操作
+    ├── theme.ts           # テーマユーティリティ
+    ├── uuid.ts            # UUID生成
+    └── validation.ts      # 入力バリデーション
 ```
 
-## Architecture Patterns
+## アーキテクチャパターン
 
-### Component Hierarchy
+### コンポーネント構成
 
-- **TodoApp** - Root container managing state and business logic
-- **TodoForm** - Handles task creation with validation
-- **TodoList** - Renders task collection with empty states
-- **TodoItem** - Individual task with toggle/delete actions
-- **EmptyState** - User-friendly empty list display
+- **アトミックデザイン**: 複雑さと再利用性によるコンポーネント整理
+- **コンテナ/プレゼンテーション**: `TodoApp`が状態管理、子コンポーネントが表示処理
+- **コンポジション**: コンポーネントがchildrenを受け取り合成される
 
-### State Management
+### 状態管理
 
-- React useState for local component state
-- Props drilling for data flow (no external state library)
-- localStorage for persistence via utility functions
+- **ローカル状態**: コンポーネント固有状態にReact `useState`
+- **コンテキスト**: React Contextでテーマ状態共有
+- **永続化**: データ永続化にlocalStorage
 
-### Data Flow
+### ファイル命名規則
 
-1. User interactions trigger handlers in TodoApp
-2. State updates flow down via props
-3. Side effects (storage) handled in useEffect hooks
-4. Validation occurs before state mutations
+- **コンポーネント**: PascalCase（例: `TodoApp.tsx`）
+- **フック**: `use`プレフィックス付きcamelCase（例: `useTheme.ts`）
+- **ユーティリティ**: camelCase（例: `storage.ts`）
+- **型**: camelCase（例: `todo.ts`）
+- **テスト**: ソースファイルに`.test.tsx`サフィックス
 
-## File Naming Conventions
+### インポート/エクスポートパターン
 
-- **Components**: PascalCase (e.g., `TodoApp.tsx`)
-- **Utilities**: camelCase (e.g., `storage.ts`)
-- **Types**: camelCase files, PascalCase interfaces
-- **Tests**: `ComponentName.test.tsx` in `__tests__` folders
+- **バレルエクスポート**: クリーンなインポートのため`index.ts`ファイル使用
+- **パスマッピング**: srcインポートに`@/`エイリアス使用
+- **名前付きエクスポート**: ユーティリティはデフォルトエクスポートより名前付きエクスポート優先
+- **デフォルトエクスポート**: Reactコンポーネントに使用
 
-## Import Patterns
+### テスト構造
 
-- Use `@/` alias for src imports
-- Group imports: external libraries, internal modules, types
-- Default exports for components, named exports for utilities
-- Re-export from index files for clean imports
+- **コロケーション**: テストはソースコード隣の`__tests__`フォルダに配置
+- **命名**: テストファイルは`.test.tsx`拡張子でソースファイル名をミラー
+- **モック**: 外部依存関係（localStorage、crypto）を`jest.setup.js`でモック
+- **カバレッジ**: レイアウトファイルと型定義をカバレッジから除外
 
-## Testing Structure
+### コード整理原則
 
-- Co-located `__tests__` folders
-- One test file per component/utility
-- Comprehensive coverage for business logic
-- Integration tests for component interactions
+- **単一責任**: 各ファイルは明確な目的を一つ持つ
+- **依存関係の方向**: コンポーネントは型とユーティリティに依存、逆は不可
+- **機能グループ化**: 関連機能をまとめて配置
+- **テスト近接**: メンテナンスしやすいよう実装に近くテスト配置
