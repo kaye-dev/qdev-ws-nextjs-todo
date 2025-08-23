@@ -1,0 +1,16 @@
+{
+  "name": "TypeScript File Change Hook",
+  "description": ".tsファイルに変更があった場合、UnitTestとESLintを実行する",
+  "trigger": {
+    "type": "fileChange",
+    "patterns": [
+      "**/*.ts",
+      "**/*.tsx"
+    ]
+  },
+  "action": {
+    "type": "agent",
+    "request": ".tsファイルが変更されました。以下のタスクを実行してください：\n\n1. npm testを実行してユニットテストを実行\n2. npm run lintを実行してESLintチェックを実行\n\n変更されたファイル: {{changedFiles}}\n\nテスト結果とリント結果を報告してください。"
+  },
+  "enabled": true
+}
