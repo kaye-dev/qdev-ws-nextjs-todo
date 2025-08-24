@@ -1,0 +1,16 @@
+[0;34m[INFO][0m エラーハンドリングユーティリティが読み込まれました
+[0;34m[INFO][0m システム要件をチェック中...
+[0;32m[SUCCESS][0m システム要件チェックが完了しました
+[0;34m[INFO][0m AWS設定:
+[0;34m[INFO][0m   プロファイル: default
+[0;34m[INFO][0m   アカウントID: 273354629233
+[0;34m[INFO][0m   リージョン: ap-northeast-1
+[0;34m[INFO][0m ビルド設定:
+[0;34m[INFO][0m   アプリケーション名: nextjs-todo-app
+[0;34m[INFO][0m   環境: development
+[0;34m[INFO][0m   ECRリポジトリ名: nextjs-todo-app-development
+[0;34m[INFO][0m   ECRリポジトリURI: 273354629233.dkr.ecr.ap-northeast-1.amazonaws.com/nextjs-todo-app-development
+[0;34m[INFO][0m   イメージタグ: latest
+[0;34m[INFO][0m ECRリポジトリの存在確認中...
+[0;31m[ERROR][0m ECRリポジトリ 'nextjs-todo-app-development' が見つかりません。
+[0;31m[ERROR][0m CDKスタックがデプロイされているか確認してください。
