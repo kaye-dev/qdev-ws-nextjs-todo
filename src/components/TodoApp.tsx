@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Todo } from '../types/todo';
-import { generateUUID } from '../utils/uuid';
-import { loadTodosFromStorage, saveTodosToStorage } from '../utils/storage';
-import { validateTodo } from '../utils/validation';
 import TodoForm from './TodoForm';
 import TodoList from './TodoList';
 
@@ -16,14 +13,14 @@ export default function TodoApp() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Requirement 4.1: Load initial data when application opens
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        // Add a small delay to ensure loading state is visible
-        await new Promise(resolve => setTimeout(resolve, 0));
-        const savedTodos = loadTodosFromStorage();
-        setTodos(savedTodos);
+        const response = await fetch('/api/todos');
+        if (response.ok) {
+          const todosData = await response.json();
+          setTodos(todosData);
+        }
       } catch (error) {
         console.error('Failed to load initial todos:', error);
         setTodos([]);
@@ -35,60 +32,64 @@ export default function TodoApp() {
     loadInitialData();
   }, []);
 
-  // Sync todos to localStorage whenever todos state changes
-  useEffect(() => {
-    if (!isLoading) {
-      saveTodosToStorage(todos);
-    }
-  }, [todos, isLoading]);
-
-  // Requirement 1.1: Add new task functionality
-  const handleAddTodo = (text: string) => {
+  const handleAddTodo = async (text: string) => {
     try {
-      // Get existing todo texts for duplicate validation
-      const existingTexts = todos.map(todo => todo.text);
+      const response = await fetch('/api/todos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
 
-      // Validate the new todo
-      const validationError = validateTodo(text, existingTexts);
-      if (validationError) {
-        // Error handling is done in TodoForm component
-        throw new Error(validationError.message);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to add todo');
       }
 
-      // Create new todo
-      const newTodo: Todo = {
-        id: generateUUID(),
-        text: text.trim(),
-        completed: false,
-        createdAt: new Date(),
-      };
-
-      // Add to todos array
+      const newTodo = await response.json();
       setTodos(prevTodos => [...prevTodos, newTodo]);
     } catch (error) {
       console.error('Failed to add todo:', error);
-      throw error; // Re-throw to let TodoForm handle the error display
+      throw error;
     }
   };
-  // Requirement 2.1: Toggle task completion status
-  const handleToggleTodo = (id: string) => {
+  const handleToggleTodo = async (id: string) => {
     try {
-      setTodos(prevTodos =>
-        prevTodos.map(todo =>
-          todo.id === id
-            ? { ...todo, completed: !todo.completed }
-            : todo
-        )
-      );
+      const todo = todos.find(t => t.id === id);
+      if (!todo) return;
+
+      const response = await fetch(`/api/todos/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ completed: !todo.completed }),
+      });
+
+      if (response.ok) {
+        setTodos(prevTodos =>
+          prevTodos.map(todo =>
+            todo.id === id
+              ? { ...todo, completed: !todo.completed }
+              : todo
+          )
+        );
+      }
     } catch (error) {
       console.error('Failed to toggle todo:', error);
     }
   };
 
-  // Requirement 3.1: Delete task functionality
-  const handleDeleteTodo = (id: string) => {
+  const handleDeleteTodo = async (id: string) => {
     try {
-      setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
+      const response = await fetch(`/api/todos/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
+      }
     } catch (error) {
       console.error('Failed to delete todo:', error);
     }

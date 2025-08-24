@@ -627,11 +627,9 @@ describe('Theme Integration Tests', () => {
     it('should handle component unmounting during theme operations', async () => {
       mockThemeUtils.loadThemeFromStorage.mockReturnValue('system');
 
-      let systemThemeCallback: (theme: 'light' | 'dark') => void = () => { };
       const mockCleanup = jest.fn();
 
-      mockThemeUtils.createSystemThemeListener.mockImplementation((callback) => {
-        systemThemeCallback = callback;
+      mockThemeUtils.createSystemThemeListener.mockImplementation(() => {
         return mockCleanup;
       });
 
