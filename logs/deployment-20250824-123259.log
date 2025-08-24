@@ -1,0 +1,11 @@
+[0;34m[INFO][0m エラーハンドリングユーティリティが読み込まれました
+[0;34m[INFO][0m システム要件をチェック中...
+[0;32m[SUCCESS][0m システム要件チェックが完了しました
+[0;34m[INFO][0m デプロイメント設定:
+[0;34m[INFO][0m   アプリケーション名: nextjs-todo-app
+[0;34m[INFO][0m   環境: development
+[0;34m[INFO][0m   スタック名: nextjs-todo-app-development
+[0;34m[INFO][0m   AWSアカウントID: 273354629233
+[0;34m[INFO][0m   リージョン: ap-northeast-1
+[0;34m[INFO][0m   承認設定: never
+[1;33m[WARNING][0m ドライラン実行中 - 実際のコマンドは実行されません
