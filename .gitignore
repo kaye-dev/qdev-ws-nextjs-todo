@@ -46,3 +46,4 @@ next-env.d.ts
 node_modules
 cdk.out/
 cdk/coverage/
+cdk.context.json
