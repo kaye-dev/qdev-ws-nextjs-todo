@@ -29,7 +29,7 @@ export interface TodoOperations {
  */
 export interface TodoFormProps {
   /** Function called when a new todo should be added */
-  onAddTodo: (text: string) => void;
+  onAddTodo: (text: string) => Promise<void>;
 }
 
 /**

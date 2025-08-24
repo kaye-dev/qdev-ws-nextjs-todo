@@ -1,38 +1,50 @@
 # QDev-Kiro-WS-NextJS-Todo
 
-Amazon Q DeveloperとKiroワークショップ用のNext.jsサンプルアプリケーションです。
-シンプルなTodoアプリケーションをAWS ECS Fargateにデプロイする方法を学習できます。
+Amazon Q Developer と Kiro ワークショップ用の Next.js サンプルアプリケーションです。
+シンプルな Todo アプリケーションを AWS ECS Fargate にデプロイする方法を学習できます。
 
 > **注意**: このアプリケーションはワークショップ用のサンプルです。本番環境での利用は避けてください。
 
 ## 目次
 
 - [ローカル開発](#ローカル開発)
-- [AWSデプロイメント](#awsデプロイメント)
+- [AWS デプロイメント](#awsデプロイメント)
 - [プロジェクト構成](#プロジェクト構成)
 
 ## ローカル開発
 
-開発サーバーを起動：
+### DynamoDB Local を使用した開発
+
+ローカル環境で DynamoDB を使用して開発：
 
 ```bash
 npm install
-npm run dev
+npm run dynamodb:start    # DynamoDB Localを起動
+npm run dynamodb:setup    # テーブル作成
+npm run dev               # 開発サーバー起動
 ```
+
+DynamoDB Local を停止：
+
+```bash
+npm run dynamodb:stop
+```
+
+> **注意**: ローカル開発時は DynamoDB Local（Docker コンテナ）を使用し、AWS デプロイ時は実際の AWS DynamoDB を使用します。データは環境ごとに分離されています。
 
 ブラウザで <http://localhost:3000> を開いてアプリケーションを確認してください。
 
-## AWSデプロイメント
+## AWS デプロイメント
 
-本アプリケーションはAWS CDKを使用してECS Fargateにデプロイされます。
+本アプリケーションは AWS CDK を使用して ECS Fargate にデプロイされます。
 
 ### 前提条件
 
-- **Node.js** (v18以上)
-- **AWS CLI** (v2推奨)
-- **AWS CDK CLI** (v2.170.0以上)
+- **Node.js** (v18 以上)
+- **AWS CLI** (v2 推奨)
+- **AWS CDK CLI** (v2.170.0 以上)
 - **Docker**
-- **AWS認証設定**
+- **AWS 認証設定**
 
 ### デプロイ手順
 
@@ -79,6 +91,11 @@ npm run docker:build   # イメージビルド
 
 # 完全デプロイ
 npm run deploy         # ビルド + プッシュ + デプロイ
+
+# DynamoDB Local関連
+npm run dynamodb:start # DynamoDB Localを起動
+npm run dynamodb:stop  # DynamoDB Localを停止
+npm run dynamodb:setup # ローカルテーブル作成
 ```
 
 ### クリーンアップ
@@ -113,10 +130,10 @@ npm run cdk:destroy
 
 #### フロントエンド
 
-- **Next.js 15.4.6**: App Routerを使用したReactフレームワーク
-- **React 19.1.0**: UIライブラリ
-- **TypeScript 5**: 型安全なJavaScript
-- **Tailwind CSS 4**: ユーティリティファーストCSSフレームワーク
+- **Next.js 15.4.6**: App Router を使用した React フレームワーク
+- **React 19.1.0**: UI ライブラリ
+- **TypeScript 5**: 型安全な JavaScript
+- **Tailwind CSS 4**: ユーティリティファースト CSS フレームワーク
 
 #### インフラストラクチャ
 
@@ -124,6 +141,7 @@ npm run cdk:destroy
 - **AWS ECS Fargate**: コンテナオーケストレーション
 - **AWS ECR**: コンテナレジストリ
 - **AWS ALB**: ロードバランサー
+- **AWS DynamoDB**: NoSQL データベース
 - **Docker**: コンテナ化
 
 #### 開発・テスト
@@ -136,9 +154,9 @@ npm run cdk:destroy
 
 ## Learn More
 
-Next.jsについて詳しく学ぶには、以下のリソースをご覧ください：
+Next.js について詳しく学ぶには、以下のリソースをご覧ください：
 
-- [Next.js Documentation](https://nextjs.org/docs) - Next.jsの機能とAPIについて学ぶ
-- [Learn Next.js](https://nextjs.org/learn) - インタラクティブなNext.jsチュートリアル
+- [Next.js Documentation](https://nextjs.org/docs) - Next.js の機能と API について学ぶ
+- [Learn Next.js](https://nextjs.org/learn) - インタラクティブな Next.js チュートリアル
 
 [Next.js GitHub repository](https://github.com/vercel/next.js)もチェックしてみてください - フィードバックや貢献を歓迎します！

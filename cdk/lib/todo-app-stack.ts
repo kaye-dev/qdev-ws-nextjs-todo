@@ -1,4 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecr from 'aws-cdk-lib/aws-ecr';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
@@ -45,6 +46,9 @@ export class TodoAppStack extends cdk.Stack {
   public readonly targetGroup: elbv2.ApplicationTargetGroup;
   public readonly listener: elbv2.ApplicationListener;
 
+  // DynamoDBリソース
+  public readonly todoTable: dynamodb.Table;
+
   constructor(scope: Construct, id: string, props: TodoAppStackProps) {
     super(scope, id, props);
 
@@ -68,6 +72,9 @@ export class TodoAppStack extends cdk.Stack {
     const { repository, ecsTaskExecutionRole } = this.referenceExistingEcrRepository();
     this.ecrRepository = repository;
     this.ecsTaskExecutionRole = ecsTaskExecutionRole;
+
+    // DynamoDBテーブルの作成（タスク定義作成前に必要）
+    this.todoTable = this.createDynamoDbTable();
 
     // ECSクラスターとタスク定義の作成
     this.logGroup = this.createLogGroup();
@@ -368,6 +375,8 @@ export class TodoAppStack extends cdk.Stack {
         NODE_ENV: 'production',
         PORT: this.containerPort.toString(),
         NEXT_TELEMETRY_DISABLED: '1',
+        AWS_REGION: this.region,
+        DYNAMODB_TABLE_NAME: this.todoTable.tableName,
       },
       // ヘルスチェック設定
       healthCheck: {
@@ -424,7 +433,8 @@ export class TodoAppStack extends cdk.Stack {
       resources: ['*']
     }));
 
-    // 将来的にDynamoDBやS3などのサービスにアクセスする場合は、ここに権限を追加
+    // DynamoDBテーブルへのアクセス権限を追加
+    this.todoTable.grantReadWriteData(taskRole);
 
     cdk.Tags.of(taskRole).add('Name', `${this.appName}-${this.deploymentEnvironment}-ecs-task-role`);
 
@@ -544,6 +554,28 @@ export class TodoAppStack extends cdk.Stack {
     cdk.Tags.of(service).add('Name', `${this.appName}-${this.deploymentEnvironment}-service`);
 
     return service;
+  }
+
+  /**
+   * DynamoDBテーブルを作成
+   */
+  private createDynamoDbTable(): dynamodb.Table {
+    const table = new dynamodb.Table(this, 'TodoTable', {
+      tableName: 'TodoTable',
+      partitionKey: {
+        name: 'id',
+        type: dynamodb.AttributeType.STRING,
+      },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: this.deploymentEnvironment === 'production'
+        ? cdk.RemovalPolicy.RETAIN
+        : cdk.RemovalPolicy.DESTROY,
+      pointInTimeRecovery: this.deploymentEnvironment === 'production',
+    });
+
+    cdk.Tags.of(table).add('Name', `${this.appName}-${this.deploymentEnvironment}-todo-table`);
+
+    return table;
   }
 
   /**
@@ -714,6 +746,18 @@ export class TodoAppStack extends cdk.Stack {
         protocol: 'HTTP'
       }),
       description: 'ロードバランサー設定情報'
+    });
+
+    // DynamoDB関連の出力
+    new cdk.CfnOutput(this, 'DynamoDbTableName', {
+      value: this.todoTable.tableName,
+      description: 'DynamoDB テーブル名',
+      exportName: `${this.stackName}-DynamoDbTableName`
+    });
+
+    new cdk.CfnOutput(this, 'DynamoDbTableArn', {
+      value: this.todoTable.tableArn,
+      description: 'DynamoDB テーブル ARN'
     });
   }
 }
