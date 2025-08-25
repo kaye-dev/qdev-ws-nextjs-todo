@@ -47,3 +47,7 @@ node_modules
 cdk.out/
 cdk/coverage/
 cdk.context.json
+
+# amazonq
+.amazonq/mcp.json
+.amazonq/agents
