@@ -23,13 +23,4 @@ export {
   sanitizeTodoText
 } from './validation';
 
-// Theme utilities
-export {
-  THEME_STORAGE_KEY,
-  getSystemTheme,
-  resolveTheme,
-  loadThemeFromStorage,
-  saveThemeToStorage,
-  applyThemeToHtml,
-  createSystemThemeListener
-} from './theme';
+// テーマ関連のユーティリティは削除されました（ライトモードのみ対応）

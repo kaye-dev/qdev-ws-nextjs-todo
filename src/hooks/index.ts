@@ -2,4 +2,4 @@
  * Custom hooks re-exports
  */
 
-export { useTheme } from './useTheme';
+// テーマ関連のフックは削除されました（ライトモードのみ対応）
