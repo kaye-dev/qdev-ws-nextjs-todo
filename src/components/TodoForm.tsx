@@ -81,7 +81,7 @@ export default function TodoForm({ onAddTodo }: TodoFormProps) {
 
   return (
     <div className="w-full max-w-md mx-auto mb-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:hover:border-gray-600">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 transition-all duration-300 hover:shadow-md hover:border-gray-200">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
             <input
@@ -100,8 +100,8 @@ export default function TodoForm({ onAddTodo }: TodoFormProps) {
               transform hover:scale-[1.01] focus:scale-[1.01]
               placeholder:text-gray-400
               ${error
-                  ? 'border-red-400 bg-red-50 text-gray-900 focus:ring-red-400 shadow-sm dark:bg-red-900/20 dark:border-red-400 dark:text-gray-100 dark:focus:ring-red-400'
-                  : 'border-gray-200 bg-white text-gray-900 hover:border-gray-300 hover:bg-white focus:ring-blue-400 focus:bg-white hover:shadow-sm focus:shadow-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:hover:border-gray-500 dark:hover:bg-gray-600 dark:focus:ring-blue-400 dark:focus:bg-gray-600 dark:hover:shadow-gray-900/20 dark:focus:shadow-gray-900/30 dark:placeholder:text-gray-400'
+                  ? 'border-red-400 bg-red-50 text-gray-900 focus:ring-red-400 shadow-sm'
+                  : 'border-gray-200 bg-white text-gray-900 hover:border-gray-300 hover:bg-white focus:ring-blue-400 focus:bg-white hover:shadow-sm focus:shadow-md'
                 }
             `}
               maxLength={200}
@@ -114,8 +114,8 @@ export default function TodoForm({ onAddTodo }: TodoFormProps) {
             <div
               id="char-count"
               className={`absolute right-3 top-3 text-xs transition-colors duration-200 ${inputValue.length > 180
-                ? 'text-red-500 dark:text-red-400 font-medium'
-                : 'text-gray-400 dark:text-gray-500'
+                ? 'text-red-500 font-medium'
+                : 'text-gray-400'
                 }`}
               aria-live="polite"
               aria-label={`${inputValue.length}文字入力済み、最大200文字`}
@@ -128,7 +128,7 @@ export default function TodoForm({ onAddTodo }: TodoFormProps) {
           {error && (
             <div
               id="todo-error"
-              className="text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-3 animate-in slide-in-from-top-2 duration-300"
+              className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-md p-3 animate-in slide-in-from-top-2 duration-300"
               role="alert"
               aria-live="assertive"
             >
@@ -152,8 +152,8 @@ export default function TodoForm({ onAddTodo }: TodoFormProps) {
             transform hover:scale-[1.02] active:scale-[0.98]
             focus:outline-none focus:ring-2 focus:ring-offset-2
             ${isSubmitting || inputValue.length === 0
-                ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed focus:ring-gray-400 dark:focus:ring-gray-500 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-800'
-                : 'bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700 active:bg-blue-700 dark:active:bg-blue-800 hover:shadow-lg focus:shadow-lg focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-white dark:focus:ring-offset-gray-800 dark:hover:shadow-blue-900/20'
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-400 focus:ring-offset-gray-100'
+                : 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 hover:shadow-lg focus:shadow-lg focus:ring-blue-500 focus:ring-offset-white'
               }
           `}
             aria-label={isSubmitting ? 'タスクを追加中です' : 'タスクを追加する'}

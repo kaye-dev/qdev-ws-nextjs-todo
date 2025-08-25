@@ -16,14 +16,14 @@ export default function TodoItem({ todo, onToggleTodo, onDeleteTodo }: TodoItemP
   };
 
   return (
-    <div className="group flex items-center gap-3 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md hover:bg-white dark:hover:bg-gray-750 dark:hover:shadow-gray-900/20 hover:border-gray-200 dark:hover:border-gray-600 transition-all duration-300 ease-in-out transform hover:scale-[1.01] hover:-translate-y-0.5">
+    <div className="group flex items-center gap-3 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-100 shadow-sm hover:shadow-md hover:bg-white hover:border-gray-200 transition-all duration-300 ease-in-out transform hover:scale-[1.01] hover:-translate-y-0.5">
       {/* Checkbox for completion state */}
       <label className="flex items-center cursor-pointer min-h-[44px] min-w-[44px] justify-center">
         <input
           type="checkbox"
           checked={todo.completed}
           onChange={handleToggle}
-          className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 dark:text-blue-400 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-md outline-none focus:outline-none focus:ring-0 cursor-pointer transition-all duration-200 hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+          className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 bg-white border-2 border-gray-200 rounded-md outline-none focus:outline-none focus:ring-0 cursor-pointer transition-all duration-200 hover:border-blue-300 hover:bg-blue-50"
           aria-describedby={`todo-text-${todo.id}`}
         />
         <span className="sr-only">
@@ -35,8 +35,8 @@ export default function TodoItem({ todo, onToggleTodo, onDeleteTodo }: TodoItemP
       <span
         id={`todo-text-${todo.id}`}
         className={`flex-1 text-sm sm:text-base leading-relaxed select-text ${todo.completed
-          ? 'line-through text-gray-500 dark:text-gray-400 opacity-75'
-          : 'text-gray-900 dark:text-gray-100'
+          ? 'line-through text-gray-500 opacity-75'
+          : 'text-gray-900'
           } transition-all duration-300 ease-in-out`}
         role="text"
         aria-label={`タスク: ${todo.text}${todo.completed ? ' (完了済み)' : ' (未完了)'}`}
@@ -47,7 +47,7 @@ export default function TodoItem({ todo, onToggleTodo, onDeleteTodo }: TodoItemP
       {/* Delete button */}
       <button
         onClick={handleDelete}
-        className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-all duration-200 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 group-hover:opacity-100 opacity-70"
+        className="flex items-center justify-center min-h-[44px] min-w-[44px] p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md transition-all duration-200 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 group-hover:opacity-100 opacity-70"
         aria-label={`タスク「${todo.text}」を削除する`}
         type="button"
         title="タスクを削除"
