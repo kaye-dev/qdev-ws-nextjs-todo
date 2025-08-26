@@ -6,6 +6,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as sns from 'aws-cdk-lib/aws-sns';
 import { Construct } from 'constructs';
 
 export interface TodoAppStackProps extends cdk.StackProps {
@@ -48,6 +49,10 @@ export class TodoAppStack extends cdk.Stack {
 
   // DynamoDBリソース
   public readonly todoTable: dynamodb.Table;
+  public readonly notificationTable: dynamodb.Table;
+
+  // SNSリソース
+  public readonly snsTopicArn: string;
 
   constructor(scope: Construct, id: string, props: TodoAppStackProps) {
     super(scope, id, props);
@@ -75,6 +80,10 @@ export class TodoAppStack extends cdk.Stack {
 
     // DynamoDBテーブルの作成（タスク定義作成前に必要）
     this.todoTable = this.createDynamoDbTable();
+    this.notificationTable = this.createNotificationTable();
+
+    // SNSトピックの作成
+    this.snsTopicArn = this.createSnsResources();
 
     // ECSクラスターとタスク定義の作成
     this.logGroup = this.createLogGroup();
@@ -377,6 +386,10 @@ export class TodoAppStack extends cdk.Stack {
         NEXT_TELEMETRY_DISABLED: '1',
         AWS_REGION: this.region,
         DYNAMODB_TABLE_NAME: this.todoTable.tableName,
+        NOTIFICATION_TABLE_NAME: this.notificationTable.tableName,
+        SNS_TOPIC_ARN: this.snsTopicArn,
+        // CDK Watchでの開発用
+        CDK_WATCH_MODE: process.env.CDK_WATCH_MODE || 'false',
       },
       // ヘルスチェック設定
       healthCheck: {
@@ -435,6 +448,19 @@ export class TodoAppStack extends cdk.Stack {
 
     // DynamoDBテーブルへのアクセス権限を追加
     this.todoTable.grantReadWriteData(taskRole);
+    this.notificationTable.grantReadWriteData(taskRole);
+
+    // SNSへのアクセス権限を追加
+    taskRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'sns:Publish',
+        'sns:Subscribe',
+        'sns:Unsubscribe',
+        'sns:ListSubscriptionsByTopic'
+      ],
+      resources: [this.snsTopicArn]
+    }));
 
     cdk.Tags.of(taskRole).add('Name', `${this.appName}-${this.deploymentEnvironment}-ecs-task-role`);
 
@@ -576,6 +602,42 @@ export class TodoAppStack extends cdk.Stack {
     cdk.Tags.of(table).add('Name', `${this.appName}-${this.deploymentEnvironment}-todo-table`);
 
     return table;
+  }
+
+  /**
+   * 通知設定DynamoDBテーブルを作成
+   */
+  private createNotificationTable(): dynamodb.Table {
+    const table = new dynamodb.Table(this, 'NotificationTable', {
+      tableName: 'NotificationSettings',
+      partitionKey: {
+        name: 'id',
+        type: dynamodb.AttributeType.STRING,
+      },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: this.deploymentEnvironment === 'production'
+        ? cdk.RemovalPolicy.RETAIN
+        : cdk.RemovalPolicy.DESTROY,
+      pointInTimeRecovery: this.deploymentEnvironment === 'production',
+    });
+
+    cdk.Tags.of(table).add('Name', `${this.appName}-${this.deploymentEnvironment}-notification-table`);
+
+    return table;
+  }
+
+  /**
+   * SNSリソースを作成
+   */
+  private createSnsResources(): string {
+    const topic = new sns.Topic(this, 'TodoNotificationTopic', {
+      topicName: `${this.appName}-${this.deploymentEnvironment}-todo-notifications`,
+      displayName: 'Todo App Notifications',
+    });
+
+    cdk.Tags.of(topic).add('Name', `${this.appName}-${this.deploymentEnvironment}-sns-topic`);
+
+    return topic.topicArn;
   }
 
   /**
@@ -758,6 +820,24 @@ export class TodoAppStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'DynamoDbTableArn', {
       value: this.todoTable.tableArn,
       description: 'DynamoDB テーブル ARN'
+    });
+
+    new cdk.CfnOutput(this, 'NotificationTableName', {
+      value: this.notificationTable.tableName,
+      description: '通知設定テーブル名',
+      exportName: `${this.stackName}-NotificationTableName`
+    });
+
+    new cdk.CfnOutput(this, 'NotificationTableArn', {
+      value: this.notificationTable.tableArn,
+      description: '通知設定テーブル ARN'
+    });
+
+    // SNS関連の出力
+    new cdk.CfnOutput(this, 'SnsTopicArn', {
+      value: this.snsTopicArn,
+      description: 'SNSトピックARN',
+      exportName: `${this.stackName}-SnsTopicArn`
     });
   }
 }

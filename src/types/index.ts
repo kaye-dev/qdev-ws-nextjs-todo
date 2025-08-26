@@ -1,6 +1,6 @@
 // Re-export all types for easier importing
 export * from './todo';
-export * from './theme';
+// テーマ関連の型は削除されました（ライトモードのみ対応）
 
 /**
  * Generic utility types for the application
