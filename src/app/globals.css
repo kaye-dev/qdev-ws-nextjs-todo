@@ -1,110 +1,8 @@
 @import "tailwindcss";
 
-/* Tailwind CSS 4 dark mode configuration */
+/* Tailwind CSS 4 configuration */
 @theme {
   --default-transition-duration: 300ms;
-}
-
-/* Override Tailwind CSS 4 dark mode to use class-based strategy */
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    color-scheme: dark;
-  }
-}
-
-:root.dark {
-  color-scheme: dark;
-}
-
-/* Force class-based dark mode for specific components */
-.dark .dark\:bg-gray-800 {
-  background-color: rgb(31 41 55) !important;
-}
-
-.dark .dark\:bg-gray-700 {
-  background-color: rgb(55 65 81) !important;
-}
-
-.dark .dark\:bg-white {
-  background-color: rgb(255 255 255) !important;
-}
-
-.dark .dark\:border-gray-700 {
-  border-color: rgb(55 65 81) !important;
-}
-
-.dark .dark\:border-gray-600 {
-  border-color: rgb(75 85 99) !important;
-}
-
-.dark .dark\:border-gray-200 {
-  border-color: rgb(229 231 235) !important;
-}
-
-.dark .dark\:text-gray-100 {
-  color: rgb(243 244 246) !important;
-}
-
-.dark .dark\:hover\:border-gray-600:hover {
-  border-color: rgb(75 85 99) !important;
-}
-
-.dark .dark\:hover\:bg-gray-600:hover {
-  background-color: rgb(75 85 99) !important;
-}
-
-/* ThemeToggle specific overrides */
-.dark .theme-toggle-button.dark\:bg-white {
-  background-color: rgb(255 255 255) !important;
-}
-
-.dark .theme-toggle-button.dark\:border-gray-200 {
-  border-color: rgb(229 231 235) !important;
-}
-
-/* More specific ThemeToggle overrides */
-.dark .theme-toggle-button {
-  background-color: rgb(255 255 255) !important;
-  border-color: rgb(229 231 235) !important;
-}
-
-/* Light mode ThemeToggle overrides */
-:root:not(.dark) .theme-toggle-button {
-  background-color: rgb(17 24 39) !important; /* bg-gray-900 */
-  border-color: rgb(31 41 55) !important; /* border-gray-800 */
-}
-
-/* Ensure ThemeToggle is always perfectly circular */
-.theme-toggle-button {
-  border-radius: 50% !important;
-  aspect-ratio: 1 / 1 !important;
-  width: 44px !important;
-  height: 44px !important;
-}
-
-@media (min-width: 640px) {
-  .theme-toggle-button {
-    width: 48px !important;
-    height: 48px !important;
-  }
-}
-
-@media (min-width: 768px) {
-  .theme-toggle-button {
-    width: 52px !important;
-    height: 52px !important;
-  }
-}
-
-/* Ensure light mode overrides */
-:root:not(.dark) .dark\:bg-gray-800,
-:root:not(.dark) .dark\:bg-gray-700,
-:root:not(.dark) .dark\:border-gray-700,
-:root:not(.dark) .dark\:border-gray-600,
-:root:not(.dark) .dark\:text-gray-100 {
-  background-color: initial !important;
-  border-color: initial !important;
-  color: initial !important;
 }
 
 /* Remove outline and focus ring from all input fields */
@@ -133,7 +31,7 @@ button:focus {
   box-shadow: none !important;
 }
 
-/* Base theme variables - Light mode defaults */
+/* Light mode theme variables */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -144,39 +42,6 @@ button:focus {
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-/* Manual theme control - Light mode */
-:root.light {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-/* Manual theme control - Dark mode */
-:root.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-}
-
-/* System theme - follows user's OS preference */
-:root.system {
-  /* Default to light theme */
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-/* System theme dark mode detection */
-@media (prefers-color-scheme: dark) {
-  :root.system {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-  
-  /* Fallback for when no manual theme class is set */
-  :root:not(.light):not(.dark):not(.system) {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 * {
@@ -197,7 +62,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Global theme transition for all elements */
+/* Global transition for all elements */
 *,
 *::before,
 *::after {
@@ -241,17 +106,6 @@ body {
     scroll-behavior: auto !important;
     transform: none !important;
   }
-  
-  /* Ensure theme toggle still works without animations */
-  .theme-toggle-button {
-    transition: none !important;
-    transform: none !important;
-  }
-  
-  .theme-toggle-icon {
-    transition: none !important;
-    transform: none !important;
-  }
 }
 
 /* Custom scrollbar for webkit browsers */
@@ -259,63 +113,17 @@ body {
   width: 8px;
 }
 
-/* Light theme scrollbar */
-:root.light ::-webkit-scrollbar-track,
-:root:not(.dark):not(.system) ::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
 
-:root.light ::-webkit-scrollbar-thumb,
-:root:not(.dark):not(.system) ::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
 
-:root.light ::-webkit-scrollbar-thumb:hover,
-:root:not(.dark):not(.system) ::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-
-/* Dark theme scrollbar */
-:root.dark ::-webkit-scrollbar-track {
-  background: #1e293b;
-}
-
-:root.dark ::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 4px;
-}
-
-:root.dark ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-/* System theme scrollbar */
-:root.system ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-:root.system ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-:root.system ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root.system ::-webkit-scrollbar-track {
-    background: #1e293b;
-  }
-  
-  :root.system ::-webkit-scrollbar-thumb {
-    background: #475569;
-  }
-  
-  :root.system ::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
-  }
 }
 
 /* High contrast mode support */
@@ -372,37 +180,6 @@ body {
   }
 }
 
-@keyframes icon-rotate-in {
-  from {
-    opacity: 0;
-    transform: rotate(-90deg) scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(0deg) scale(1);
-  }
-}
-
-@keyframes icon-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes button-bounce {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
 .animate-in {
   animation-fill-mode: both;
 }
@@ -421,151 +198,4 @@ body {
 
 .fade-in {
   animation: fade-in 0.5s ease-out;
-}
-
-.icon-rotate-in {
-  animation: icon-rotate-in 0.3s ease-out;
-}
-
-.icon-fade-in {
-  animation: icon-fade-in 0.2s ease-out;
-}
-
-.button-bounce {
-  animation: button-bounce 0.3s ease-out;
-}
-
-/* Theme toggle specific styles */
-.theme-toggle-button {
-  /* Ensure highest z-index to avoid UI conflicts */
-  z-index: 9999;
-  /* Proper positioning with safe margins from screen edges */
-  position: fixed;
-  /* Ensure minimum touch target size for accessibility */
-  min-width: 44px;
-  min-height: 44px;
-  /* Smooth transitions for all interactions */
-  transition: 
-    transform 0.2s ease,
-    box-shadow 0.3s ease,
-    background-color 0.3s ease,
-    border-color 0.3s ease,
-    opacity 0.3s ease;
-  /* Prevent text selection */
-  user-select: none;
-  /* Ensure button doesn't interfere with scrolling */
-  touch-action: manipulation;
-}
-
-/* Responsive positioning with proper margins */
-@media (max-width: 640px) {
-  .theme-toggle-button {
-    /* Ensure 16px minimum margin from screen edges on mobile */
-    bottom: 1rem !important;
-    right: 1rem !important;
-    /* Ensure minimum 44px touch target on mobile */
-    min-width: 44px;
-    min-height: 44px;
-    padding: 0.75rem;
-  }
-}
-
-@media (min-width: 641px) and (max-width: 768px) {
-  .theme-toggle-button {
-    /* Slightly larger margins on tablets */
-    bottom: 1.5rem !important;
-    right: 1.5rem !important;
-    min-width: 48px;
-    min-height: 48px;
-    padding: 1rem;
-  }
-}
-
-@media (min-width: 769px) {
-  .theme-toggle-button {
-    /* Larger margins on desktop */
-    bottom: 2rem !important;
-    right: 2rem !important;
-    min-width: 52px;
-    min-height: 52px;
-    padding: 1rem;
-  }
-}
-
-/* Hover effects with proper scaling */
-.theme-toggle-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-/* Focus state for keyboard navigation */
-.theme-toggle-button:focus {
-  transform: scale(1.02);
-  /* Ensure focus ring is visible above other elements */
-  z-index: 10000;
-}
-
-/* Active state feedback */
-.theme-toggle-button:active {
-  transform: scale(0.98);
-  transition-duration: 0.1s;
-}
-
-/* Icon transitions and responsive sizing */
-.theme-toggle-icon {
-  transition: 
-    transform 0.3s ease,
-    opacity 0.2s ease,
-    color 0.3s ease;
-  /* Prevent icon from being selectable */
-  pointer-events: none;
-}
-
-/* Subtle icon rotation on hover - DISABLED */
-.theme-toggle-button:hover .theme-toggle-icon {
-  transform: none;
-}
-
-/* Dark mode specific hover effects */
-:root.dark .theme-toggle-button:hover {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-}
-
-/* System theme dark mode hover effects */
-@media (prefers-color-scheme: dark) {
-  :root.system .theme-toggle-button:hover {
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-  }
-}
-
-/* Ensure button doesn't interfere with other fixed elements */
-.theme-toggle-button {
-  /* Create stacking context */
-  isolation: isolate;
-}
-
-/* High contrast mode support for theme toggle */
-@media (prefers-contrast: high) {
-  .theme-toggle-button {
-    border-width: 2px;
-    border-style: solid;
-  }
-}
-
-/* Ensure proper spacing from viewport edges on very small screens */
-@media (max-width: 360px) {
-  .theme-toggle-button {
-    bottom: 0.75rem !important;
-    right: 0.75rem !important;
-    min-width: 44px;
-    min-height: 44px;
-  }
-}
-
-/* Large screen optimizations */
-@media (min-width: 1200px) {
-  .theme-toggle-button {
-    bottom: 2.5rem !important;
-    right: 2.5rem !important;
-  }
 }

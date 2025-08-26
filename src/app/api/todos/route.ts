@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { saveTodoToDynamoDB, loadTodosFromDynamoDB } from '../../../utils/todoService';
+import { publishTaskNotification } from '../../../utils/notificationService';
 import { generateUUID } from '../../../utils/uuid';
 import { validateTodo } from '../../../utils/validation';
 
@@ -30,6 +31,17 @@ export async function POST(request: NextRequest) {
     };
 
     await saveTodoToDynamoDB(newTodo);
+    
+    // SNS通知を送信
+    try {
+      console.log('Attempting to send notification for new todo:', newTodo.text);
+      await publishTaskNotification(newTodo.text);
+      console.log('Notification sent successfully');
+    } catch (notificationError) {
+      console.error('Failed to send notification:', notificationError);
+      // 通知送信に失敗してもTodo作成は成功として扱う
+    }
+    
     return NextResponse.json(newTodo, { status: 201 });
   } catch (error) {
     console.error('Failed to create todo:', error);
