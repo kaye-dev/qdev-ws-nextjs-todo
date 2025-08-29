@@ -8,7 +8,7 @@ set -e  # エラー時に即座に終了
 # 設定
 APP_NAME="nextjs-todo-app"
 ECR_REPOSITORY_NAME="nextjs-todo-app"
-REGION="ap-northeast-1"
+REGION="us-east-1"
 IMAGE_TAG="latest"
 
 echo "=== Next.js Todo App デプロイメント開始 ==="
