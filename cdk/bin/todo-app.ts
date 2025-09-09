@@ -17,7 +17,7 @@ new TodoAppStack(app, "TodoAppStack", {
   memory: 512,
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
-    region: "us-east-1",
+    region: "ap-northeast-1",
   },
   description: `${appName} - Sample application - ECS Fargate deployment`,
   tags: {
