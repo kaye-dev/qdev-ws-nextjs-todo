@@ -25,8 +25,7 @@ npm install
 {
   "context": {
     // ... 既存の設定 ...
-    "name": "your-name", // あなたの名前に変更（英数字とハイフンのみ）
-    "useSharedVpc": "false" // VPC設定（下記参照）
+    "name": "your-name" // あなたの名前に変更（英数字とハイフンのみ）
   }
 }
 ```
