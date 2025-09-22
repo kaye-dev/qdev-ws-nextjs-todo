@@ -11,6 +11,7 @@ import { Construct } from "constructs";
 export interface TodoAppStackProps extends cdk.StackProps {
   appName: string;
   deploymentEnvironment: string;
+  participantName: string;
   containerPort?: number;
   desiredCount?: number;
   cpu?: number;
@@ -21,13 +22,14 @@ export class TodoAppStack extends cdk.Stack {
   // パブリックプロパティでリソースを公開
   public readonly appName: string;
   public readonly deploymentEnvironment: string;
+  public readonly participantName: string;
   public readonly containerPort: number;
   public readonly desiredCount: number;
   public readonly cpu: number;
   public readonly memory: number;
 
   // ネットワークリソース
-  public readonly vpc: ec2.Vpc;
+  public readonly vpc: ec2.IVpc;
   public readonly albSecurityGroup: ec2.SecurityGroup;
   public readonly ecsSecurityGroup: ec2.SecurityGroup;
 
@@ -58,13 +60,14 @@ export class TodoAppStack extends cdk.Stack {
     // プロパティの初期化（デフォルト値付き）
     this.appName = props.appName;
     this.deploymentEnvironment = props.deploymentEnvironment;
+    this.participantName = props.participantName;
     this.containerPort = props.containerPort || 3000;
     this.desiredCount = props.desiredCount || 1;
     this.cpu = props.cpu || 256;
     this.memory = props.memory || 512;
 
-    // ネットワーク構成の作成
-    this.vpc = this.createVpc();
+    // ネットワーク構成の作成（VPC共有機能付き）
+    this.vpc = this.createOrFindVpc();
     this.albSecurityGroup = this.createAlbSecurityGroup();
     this.ecsSecurityGroup = this.createEcsSecurityGroup();
 
@@ -209,7 +212,20 @@ export class TodoAppStack extends cdk.Stack {
   }
 
   /**
-   * VPCを作成
+   * VPCを作成または既存のVPCを検索
+   * ワークショップでのVPC共有のため、コンテキストで制御
+   */
+  private createOrFindVpc(): ec2.IVpc {
+    // VPC制限のため、常に既定のVPCを使用
+    console.log(`既定のVPCを使用します（参加者: ${this.participantName}）`);
+    const vpc = ec2.Vpc.fromLookup(this, "DefaultVpc", {
+      isDefault: true,
+    });
+    return vpc;
+  }
+
+  /**
+   * VPCを作成（従来のメソッドは参考用に残す）
    */
   private createVpc(): ec2.Vpc {
     const vpc = new ec2.Vpc(this, "TodoAppVpc", {
@@ -241,7 +257,7 @@ export class TodoAppStack extends cdk.Stack {
   private createAlbSecurityGroup(): ec2.SecurityGroup {
     const securityGroup = new ec2.SecurityGroup(this, "AlbSecurityGroup", {
       vpc: this.vpc,
-      securityGroupName: `${this.appName}-alb-sg`,
+      securityGroupName: `${this.appName}-${this.participantName}-alb-sg`,
       description: "Security group for Application Load Balancer",
       allowAllOutbound: true,
     });
@@ -260,7 +276,10 @@ export class TodoAppStack extends cdk.Stack {
       "HTTPS traffic from anywhere"
     );
 
-    cdk.Tags.of(securityGroup).add("Name", `${this.appName}-alb-sg`);
+    cdk.Tags.of(securityGroup).add(
+      "Name",
+      `${this.appName}-${this.participantName}-alb-sg`
+    );
 
     return securityGroup;
   }
@@ -271,7 +290,7 @@ export class TodoAppStack extends cdk.Stack {
   private createEcsSecurityGroup(): ec2.SecurityGroup {
     const securityGroup = new ec2.SecurityGroup(this, "EcsSecurityGroup", {
       vpc: this.vpc,
-      securityGroupName: `${this.appName}-${this.deploymentEnvironment}-ecs-sg`,
+      securityGroupName: `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-ecs-sg`,
       description: "Security group for ECS Fargate tasks",
       allowAllOutbound: true,
     });
@@ -285,7 +304,7 @@ export class TodoAppStack extends cdk.Stack {
 
     cdk.Tags.of(securityGroup).add(
       "Name",
-      `${this.appName}-${this.deploymentEnvironment}-ecs-sg`
+      `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-ecs-sg`
     );
 
     return securityGroup;
@@ -317,7 +336,7 @@ export class TodoAppStack extends cdk.Stack {
   private setupEcrPermissions(repository: ecr.IRepository): iam.Role {
     // ECSタスク実行ロール用の権限
     const ecsTaskExecutionRole = new iam.Role(this, "EcsTaskExecutionRole", {
-      roleName: `${this.appName}-ecs-task-execution-role`,
+      roleName: `${this.appName}-${this.participantName}-ecs-task-execution-role`,
       assumedBy: new iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
       description: "ECS Fargate task execution IAM role",
       managedPolicies: [
@@ -341,7 +360,7 @@ export class TodoAppStack extends cdk.Stack {
           "logs:DescribeLogStreams",
         ],
         resources: [
-          `arn:aws:logs:${this.region}:${this.account}:log-group:/ecs/${this.appName}-${this.deploymentEnvironment}*`,
+          `arn:aws:logs:${this.region}:${this.account}:log-group:/ecs/${this.appName}-${this.participantName}-${this.deploymentEnvironment}*`,
         ],
       })
     );
@@ -349,7 +368,7 @@ export class TodoAppStack extends cdk.Stack {
     // ロールにタグを追加
     cdk.Tags.of(ecsTaskExecutionRole).add(
       "Name",
-      `${this.appName}-ecs-task-execution-role`
+      `${this.appName}-${this.participantName}-ecs-task-execution-role`
     );
 
     return ecsTaskExecutionRole;
@@ -360,7 +379,7 @@ export class TodoAppStack extends cdk.Stack {
    */
   private createLogGroup(): logs.LogGroup {
     const logGroup = new logs.LogGroup(this, "TodoAppLogGroup", {
-      logGroupName: `/ecs/${this.appName}-${this.deploymentEnvironment}`,
+      logGroupName: `/ecs/${this.appName}-${this.participantName}-${this.deploymentEnvironment}`,
       retention:
         this.deploymentEnvironment === "production"
           ? logs.RetentionDays.ONE_MONTH
@@ -373,7 +392,7 @@ export class TodoAppStack extends cdk.Stack {
 
     cdk.Tags.of(logGroup).add(
       "Name",
-      `${this.appName}-${this.deploymentEnvironment}-logs`
+      `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-logs`
     );
 
     return logGroup;
@@ -384,7 +403,7 @@ export class TodoAppStack extends cdk.Stack {
    */
   private createEcsCluster(): ecs.Cluster {
     const cluster = new ecs.Cluster(this, "TodoAppCluster", {
-      clusterName: `${this.appName}-${this.deploymentEnvironment}-cluster`,
+      clusterName: `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-cluster`,
       vpc: this.vpc,
       // Container Insightsを有効化（本番環境のみ）
       containerInsights: this.deploymentEnvironment === "production",
@@ -392,7 +411,7 @@ export class TodoAppStack extends cdk.Stack {
 
     cdk.Tags.of(cluster).add(
       "Name",
-      `${this.appName}-${this.deploymentEnvironment}-cluster`
+      `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-cluster`
     );
 
     return cluster;
@@ -406,7 +425,7 @@ export class TodoAppStack extends cdk.Stack {
       this,
       "TodoAppTaskDefinition",
       {
-        family: `${this.appName}-${this.deploymentEnvironment}-task`,
+        family: `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-task`,
         cpu: this.cpu,
         memoryLimitMiB: this.memory,
         executionRole: this.ecsTaskExecutionRole,
@@ -417,7 +436,7 @@ export class TodoAppStack extends cdk.Stack {
 
     // コンテナ定義を追加
     taskDefinition.addContainer("TodoAppContainer", {
-      containerName: `${this.appName}-${this.deploymentEnvironment}-container`,
+      containerName: `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-container`,
       image: ecs.ContainerImage.fromEcrRepository(this.ecrRepository, "latest"),
       // ポートマッピング
       portMappings: [
@@ -436,6 +455,8 @@ export class TodoAppStack extends cdk.Stack {
         NODE_ENV: "production",
         PORT: this.containerPort.toString(),
         NEXT_TELEMETRY_DISABLED: "1",
+        AWS_REGION: this.region,
+        DYNAMODB_TABLE_NAME: this.todoTable.tableName,
       },
       // ヘルスチェック設定
       healthCheck: {
@@ -454,7 +475,7 @@ export class TodoAppStack extends cdk.Stack {
 
     cdk.Tags.of(taskDefinition).add(
       "Name",
-      `${this.appName}-${this.deploymentEnvironment}-task`
+      `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-task`
     );
 
     return taskDefinition;
@@ -465,7 +486,7 @@ export class TodoAppStack extends cdk.Stack {
    */
   private createTaskRole(): iam.Role {
     const taskRole = new iam.Role(this, "EcsTaskRole", {
-      roleName: `${this.appName}-${this.deploymentEnvironment}-ecs-task-role`,
+      roleName: `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-ecs-task-role`,
       assumedBy: new iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
       description: "IAM role for ECS Fargate tasks",
     });
@@ -501,7 +522,7 @@ export class TodoAppStack extends cdk.Stack {
 
     cdk.Tags.of(taskRole).add(
       "Name",
-      `${this.appName}-${this.deploymentEnvironment}-ecs-task-role`
+      `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-ecs-task-role`
     );
 
     return taskRole;
@@ -517,7 +538,7 @@ export class TodoAppStack extends cdk.Stack {
   } {
     // Application Load Balancerの作成
     const alb = new elbv2.ApplicationLoadBalancer(this, "TodoAppLoadBalancer", {
-      loadBalancerName: `${this.appName}-${this.deploymentEnvironment}-alb`,
+      loadBalancerName: `${this.appName}-${this.participantName}-alb`,
       vpc: this.vpc,
       internetFacing: true, // インターネット向け
       securityGroup: this.albSecurityGroup,
@@ -533,7 +554,7 @@ export class TodoAppStack extends cdk.Stack {
       this,
       "TodoAppTargetGroup",
       {
-        targetGroupName: `${this.appName}-${this.deploymentEnvironment}-tg`,
+        targetGroupName: `${this.appName}-${this.participantName}-tg`,
         port: this.containerPort,
         protocol: elbv2.ApplicationProtocol.HTTP,
         vpc: this.vpc,
@@ -564,13 +585,10 @@ export class TodoAppStack extends cdk.Stack {
     });
 
     // タグの追加
-    cdk.Tags.of(alb).add(
-      "Name",
-      `${this.appName}-${this.deploymentEnvironment}-alb`
-    );
+    cdk.Tags.of(alb).add("Name", `${this.appName}-${this.participantName}-alb`);
     cdk.Tags.of(targetGroup).add(
       "Name",
-      `${this.appName}-${this.deploymentEnvironment}-tg`
+      `${this.appName}-${this.participantName}-tg`
     );
 
     return { alb, targetGroup, listener };
@@ -581,7 +599,7 @@ export class TodoAppStack extends cdk.Stack {
    */
   private createEcsService(): ecs.FargateService {
     const service = new ecs.FargateService(this, "TodoAppService", {
-      serviceName: `${this.appName}-${this.deploymentEnvironment}-service`,
+      serviceName: `${this.appName}-${this.participantName}-service`,
       cluster: this.ecsCluster,
       taskDefinition: this.taskDefinition,
       desiredCount: this.desiredCount,
@@ -602,7 +620,7 @@ export class TodoAppStack extends cdk.Stack {
     // ECSサービスをALBのターゲットグループに登録
     this.targetGroup.addTarget(
       service.loadBalancerTarget({
-        containerName: `${this.appName}-${this.deploymentEnvironment}-container`,
+        containerName: `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-container`,
         containerPort: this.containerPort,
       })
     );
@@ -631,7 +649,7 @@ export class TodoAppStack extends cdk.Stack {
 
     cdk.Tags.of(service).add(
       "Name",
-      `${this.appName}-${this.deploymentEnvironment}-service`
+      `${this.appName}-${this.participantName}-service`
     );
 
     return service;
@@ -642,7 +660,7 @@ export class TodoAppStack extends cdk.Stack {
    */
   private createDynamoDbTable(): dynamodb.Table {
     const table = new dynamodb.Table(this, "TodoTable", {
-      tableName: "TodoTable",
+      tableName: `TodoTable-${this.participantName}`,
       partitionKey: {
         name: "id",
         type: dynamodb.AttributeType.STRING,
@@ -657,7 +675,7 @@ export class TodoAppStack extends cdk.Stack {
 
     cdk.Tags.of(table).add(
       "Name",
-      `${this.appName}-${this.deploymentEnvironment}-todo-table`
+      `${this.appName}-${this.participantName}-${this.deploymentEnvironment}-todo-table`
     );
 
     return table;
@@ -669,22 +687,22 @@ export class TodoAppStack extends cdk.Stack {
   private addStackOutputs(): void {
     new cdk.CfnOutput(this, "StackName", {
       value: this.stackName,
-      description: "CDKスタック名",
+      description: "CDK stack name",
     });
 
     new cdk.CfnOutput(this, "Environment", {
       value: this.deploymentEnvironment,
-      description: "デプロイメント環境",
+      description: "deploy env",
     });
 
     new cdk.CfnOutput(this, "ApplicationName", {
       value: this.appName,
-      description: "アプリケーション名",
+      description: "application name",
     });
 
     new cdk.CfnOutput(this, "Region", {
       value: this.region,
-      description: "デプロイメントリージョン",
+      description: "deploy region",
     });
 
     new cdk.CfnOutput(this, "VpcId", {
@@ -694,17 +712,17 @@ export class TodoAppStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, "PublicSubnetIds", {
       value: this.vpc.publicSubnets.map((subnet) => subnet.subnetId).join(","),
-      description: "パブリックサブネット ID一覧",
+      description: "public subnet IDs",
     });
 
     new cdk.CfnOutput(this, "AlbSecurityGroupId", {
       value: this.albSecurityGroup.securityGroupId,
-      description: "ALB セキュリティグループ ID",
+      description: "ALB secutiry group ID",
     });
 
     new cdk.CfnOutput(this, "EcsSecurityGroupId", {
       value: this.ecsSecurityGroup.securityGroupId,
-      description: "ECS セキュリティグループ ID",
+      description: "ECS secturiy group ID",
     });
 
     new cdk.CfnOutput(this, "ContainerConfiguration", {
@@ -714,44 +732,44 @@ export class TodoAppStack extends cdk.Stack {
         cpu: this.cpu,
         memory: this.memory,
       }),
-      description: "コンテナ設定情報",
+      description: "container settings",
     });
 
     // ECRリポジトリ関連の出力（参照のみ）
     new cdk.CfnOutput(this, "EcrRepositoryName", {
       value: this.ecrRepository.repositoryName,
-      description: "ECRリポジトリ名（外部管理）",
+      description: "ECR repository name",
       exportName: `${this.stackName}-EcrRepositoryName`,
     });
 
     // IAMロール関連の出力
     new cdk.CfnOutput(this, "EcsTaskExecutionRoleArn", {
       value: this.ecsTaskExecutionRole.roleArn,
-      description: "ECSタスク実行ロールARN",
+      description: "ECS task role ARN",
       exportName: `${this.stackName}-EcsTaskExecutionRoleArn`,
     });
 
     // ECS関連の出力
     new cdk.CfnOutput(this, "EcsClusterName", {
       value: this.ecsCluster.clusterName,
-      description: "ECSクラスター名",
+      description: "ECS cluster name",
       exportName: `${this.stackName}-EcsClusterName`,
     });
 
     new cdk.CfnOutput(this, "EcsClusterArn", {
       value: this.ecsCluster.clusterArn,
-      description: "ECSクラスターARN",
+      description: "ECS cluster ARN",
     });
 
     new cdk.CfnOutput(this, "TaskDefinitionArn", {
       value: this.taskDefinition.taskDefinitionArn,
-      description: "ECSタスク定義ARN",
+      description: "ECS task define ARN",
       exportName: `${this.stackName}-TaskDefinitionArn`,
     });
 
     new cdk.CfnOutput(this, "TaskDefinitionFamily", {
       value: this.taskDefinition.family,
-      description: "ECSタスク定義ファミリー名",
+      description: "ECS task define family name",
     });
 
     new cdk.CfnOutput(this, "LogGroupName", {
@@ -767,13 +785,13 @@ export class TodoAppStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, "EcsServiceName", {
       value: this.ecsService.serviceName,
-      description: "ECSサービス名",
+      description: "ECS service name",
       exportName: `${this.stackName}-EcsServiceName`,
     });
 
     new cdk.CfnOutput(this, "EcsServiceArn", {
       value: this.ecsService.serviceArn,
-      description: "ECSサービスARN",
+      description: "ECS service ARN",
     });
 
     new cdk.CfnOutput(this, "ServiceConfiguration", {
@@ -783,7 +801,7 @@ export class TodoAppStack extends cdk.Stack {
         platformVersion: "LATEST",
         assignPublicIp: true,
       }),
-      description: "ECSサービス設定情報",
+      description: "ECS service settings",
     });
 
     // ALB関連の出力
@@ -800,24 +818,24 @@ export class TodoAppStack extends cdk.Stack {
 
     new cdk.CfnOutput(this, "ApplicationUrl", {
       value: `http://${this.applicationLoadBalancer.loadBalancerDnsName}`,
-      description: "アプリケーションURL（HTTP）",
+      description: "Application URL（HTTP）",
       exportName: `${this.stackName}-ApplicationUrl`,
     });
 
     new cdk.CfnOutput(this, "TargetGroupArn", {
       value: this.targetGroup.targetGroupArn,
-      description: "ターゲットグループARN",
+      description: "Targate group ARN",
       exportName: `${this.stackName}-TargetGroupArn`,
     });
 
     new cdk.CfnOutput(this, "TargetGroupName", {
       value: this.targetGroup.targetGroupName,
-      description: "ターゲットグループ名",
+      description: "Taget group name",
     });
 
     new cdk.CfnOutput(this, "ListenerArn", {
       value: this.listener.listenerArn,
-      description: "ALBリスナーARN",
+      description: "ALB listener ARN",
     });
 
     new cdk.CfnOutput(this, "LoadBalancerConfiguration", {
@@ -828,19 +846,19 @@ export class TodoAppStack extends cdk.Stack {
         port: 80,
         protocol: "HTTP",
       }),
-      description: "ロードバランサー設定情報",
+      description: "LoadBalancer settings",
     });
 
     // DynamoDB関連の出力
     new cdk.CfnOutput(this, "DynamoDbTableName", {
       value: this.todoTable.tableName,
-      description: "DynamoDB テーブル名",
+      description: "DynamoDB table name",
       exportName: `${this.stackName}-DynamoDbTableName`,
     });
 
     new cdk.CfnOutput(this, "DynamoDbTableArn", {
       value: this.todoTable.tableArn,
-      description: "DynamoDB テーブル ARN",
+      description: "DynamoDB table ARN",
     });
   }
 }

@@ -46,11 +46,30 @@ npm run cdk:deploy -- --require-approval never
 
 # 8. 結果表示
 echo "=== デプロイメント完了 ==="
-ALB_DNS=$(aws elbv2 describe-load-balancers --region $REGION --query "LoadBalancers[?contains(LoadBalancerName, '$APP_NAME')].DNSName" --output text 2>/dev/null || echo "")
 
-if [ -n "$ALB_DNS" ]; then
-    echo "アプリケーションURL: http://$ALB_DNS"
-    echo "アプリケーションが起動するまで数分かかる場合があります"
+# nameコンテキストからスタック名を取得
+PARTICIPANT_NAME=$(jq -r '.context.name // empty' cdk.json)
+if [ -z "$PARTICIPANT_NAME" ]; then
+    echo "参加者名が設定されていません。cdk.jsonのnameを確認してください。"
+    exit 1
+fi
+
+STACK_NAME="TodoAppStack-${PARTICIPANT_NAME}"
+
+# CloudFormationスタックの出力を取得
+echo "スタック: $STACK_NAME"
+echo "CloudFormationスタックの出力を取得中..."
+
+# ApplicationUrlを取得
+APP_URL=$(aws cloudformation describe-stacks \
+    --stack-name $STACK_NAME \
+    --region $REGION \
+    --query "Stacks[0].Outputs[?OutputKey=='ApplicationUrl'].OutputValue" \
+    --output text 2>/dev/null)
+
+if [ -n "$APP_URL" ]; then
+    echo "アプリケーションURL: $APP_URL"
 else
-    echo "ALBのDNS名を取得できませんでした。AWSコンソールで確認してください。"
+    echo "スタック出力を取得できませんでした。以下のコマンドで確認してください："
+    echo "aws cloudformation describe-stacks --stack-name $STACK_NAME --region $REGION"
 fi
