@@ -17,20 +17,7 @@ AWS ECS Fargate にデプロイする Next.js Todo アプリケーションで�
 npm install
 ```
 
-### 2. cdk.json の編集
-
-`cdk.json` ファイルの `context` セクションを編集してしてください：
-
-```json
-{
-  "context": {
-    // ... 既存の設定 ...
-    "name": "your-name" // あなたの名前に変更（英数字とハイフンのみ）
-  }
-}
-```
-
-### 3. デプロイ
+### 2. デプロイ
 
 ```bash
 npm run deploy
