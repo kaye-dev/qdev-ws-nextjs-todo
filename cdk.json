@@ -56,6 +56,6 @@
     "@aws-cdk/aws-codepipeline-actions:useNewDefaultBranchForSourceAction": true,
     "app-name": "nextjs-todo-app",
     "environment": "development",
-    "name": "your-name"
+    "name": "ws-1121"
   }
 }
