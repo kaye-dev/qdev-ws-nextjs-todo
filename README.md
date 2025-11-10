@@ -19,6 +19,12 @@ npm install
 
 ### 2. デプロイ
 
+**初回のみ**
+
+```bash
+npm run cdk:bootstrap
+```
+
 ```bash
 npm run deploy
 ```

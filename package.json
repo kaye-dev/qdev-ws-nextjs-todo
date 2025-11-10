@@ -14,14 +14,14 @@
     "cdk:deploy": "cdk deploy",
     "cdk:destroy": "cdk destroy",
     "cdk:synth": "cdk synth",
-    "cdk:bootstrap": "cdk bootstrap",
+    "cdk:bootstrap": "cdk bootstrap aws://$(aws sts get-caller-identity --query Account --output text)/ap-northeast-1",
     "cdk:watch": "cdk watch",
     "deploy": "./deploy.sh"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.0.0",
     "@aws-sdk/lib-dynamodb": "^3.0.0",
-    "next": "15.4.6",
+    "next": "15.5.6",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
@@ -39,7 +39,7 @@
     "aws-cdk-lib": "^2.170.0",
     "constructs": "^10.0.0",
     "eslint": "^9",
-    "eslint-config-next": "15.4.6",
+    "eslint-config-next": "15.5.6",
     "jest": "^30.0.5",
     "jest-environment-jsdom": "^30.0.5",
     "source-map-support": "^0.5.21",
