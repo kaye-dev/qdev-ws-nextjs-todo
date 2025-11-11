@@ -7,12 +7,12 @@ RUN apk add --no-cache curl
 # 作業ディレクトリを設定
 WORKDIR /app
 
+# npmを最新版にアップデート
+RUN npm install -g npm@11.6.2
+
 # 依存関係をコピーしてインストール
 COPY package.json package-lock.json ./
 RUN npm install
-
-# npmを最新版にアップデート
-RUN npm install -g npm@11.6.2
 
 # ソースコードをコピー
 COPY . .
