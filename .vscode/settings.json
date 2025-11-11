@@ -1,0 +1,8 @@
+{
+  "chat.agent.enabled": false,
+  "amazonQ.suppressPrompts": {
+    "amazonQSessionConfigurationMessage": true,
+    "amazonQChatDisclaimer": true,
+    "amazonQChatPairProgramming": true
+  }
+}
