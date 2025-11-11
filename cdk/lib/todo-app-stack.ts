@@ -6,6 +6,7 @@ import * as ecs from "aws-cdk-lib/aws-ecs";
 import * as elbv2 from "aws-cdk-lib/aws-elasticloadbalancingv2";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as logs from "aws-cdk-lib/aws-logs";
+import * as sns from "aws-cdk-lib/aws-sns";
 import { Construct } from "constructs";
 
 export interface TodoAppStackProps extends cdk.StackProps {
@@ -51,6 +52,9 @@ export class TodoAppStack extends cdk.Stack {
   // DynamoDBリソース
   public readonly todoTable: dynamodb.Table;
 
+  // SNSリソース
+  public readonly notificationTopic: sns.Topic;
+
   constructor(scope: Construct, id: string, props: TodoAppStackProps) {
     super(scope, id, props);
 
@@ -79,6 +83,9 @@ export class TodoAppStack extends cdk.Stack {
 
     // DynamoDBテーブルの作成（タスク定義作成前に必要）
     this.todoTable = this.createDynamoDbTable();
+
+    // SNSトピックの作成
+    this.notificationTopic = this.createSnsTopic();
 
     // ECSクラスターとタスク定義の作成
     this.logGroup = this.createLogGroup();
@@ -409,6 +416,7 @@ export class TodoAppStack extends cdk.Stack {
         NEXT_TELEMETRY_DISABLED: "1",
         AWS_REGION: this.region,
         DYNAMODB_TABLE_NAME: this.todoTable.tableName,
+        SNS_TOPIC_ARN: this.notificationTopic.topicArn,
       },
       // ヘルスチェック設定
       healthCheck: {
@@ -471,6 +479,22 @@ export class TodoAppStack extends cdk.Stack {
 
     // DynamoDBテーブルへのアクセス権限を追加
     this.todoTable.grantReadWriteData(taskRole);
+
+    // SNSトピックへのPublish権限を追加
+    this.notificationTopic.grantPublish(taskRole);
+
+    // SNSサブスクリプション管理権限を追加
+    taskRole.addToPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          "sns:Subscribe",
+          "sns:Unsubscribe",
+          "sns:ListSubscriptionsByTopic",
+        ],
+        resources: [this.notificationTopic.topicArn],
+      })
+    );
 
     cdk.Tags.of(taskRole).add(
       "Name",
@@ -812,5 +836,34 @@ export class TodoAppStack extends cdk.Stack {
       value: this.todoTable.tableArn,
       description: "DynamoDB table ARN",
     });
+
+    // SNS関連の出力
+    new cdk.CfnOutput(this, "SnsTopicArn", {
+      value: this.notificationTopic.topicArn,
+      description: "SNS topic ARN for notifications",
+      exportName: `${this.stackName}-SnsTopicArn`,
+    });
+
+    new cdk.CfnOutput(this, "SnsTopicName", {
+      value: this.notificationTopic.topicName,
+      description: "SNS topic name",
+    });
+  }
+
+  /**
+   * SNSトピックを作成
+   */
+  private createSnsTopic(): sns.Topic {
+    const topic = new sns.Topic(this, "NotificationTopic", {
+      topicName: `${this.participantName}-todo-notifications`,
+      displayName: "Todo App Notifications",
+    });
+
+    cdk.Tags.of(topic).add(
+      "Name",
+      `${this.appName}-${this.participantName}-notifications`
+    );
+
+    return topic;
   }
 }
