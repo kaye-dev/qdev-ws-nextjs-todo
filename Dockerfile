@@ -11,6 +11,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
 
+# npmを最新版にアップデート
+RUN npm install -g npm@latest
+
 # ソースコードをコピー
 COPY . .
 
