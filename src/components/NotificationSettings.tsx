@@ -16,7 +16,7 @@ export default function NotificationSettings() {
 
   const loadSubscriptions = async () => {
     try {
-      const response = await fetch('/api/notifications');
+      const response = await fetch('/proxy/3000/api/notifications');
       const data = await response.json();
       setSubscriptions(data.subscriptions || []);
     } catch {
@@ -31,7 +31,7 @@ export default function NotificationSettings() {
     setError('');
 
     try {
-      const response = await fetch('/api/notifications', {
+      const response = await fetch('/proxy/3000/api/notifications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -57,7 +57,7 @@ export default function NotificationSettings() {
     if (!confirm('このサブスクリプションを削除しますか？')) return;
 
     try {
-      const response = await fetch('/api/notifications', {
+      const response = await fetch('/proxy/3000/api/notifications', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subscriptionArn }),

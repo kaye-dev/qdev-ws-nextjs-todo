@@ -16,7 +16,7 @@ export default function TodoApp() {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const response = await fetch('/api/todos');
+        const response = await fetch('/proxy/3000/api/todos');
         if (response.ok) {
           const todosData = await response.json();
           setTodos(todosData);
@@ -34,7 +34,7 @@ export default function TodoApp() {
 
   const handleAddTodo = async (text: string) => {
     try {
-      const response = await fetch('/api/todos', {
+      const response = await fetch('/proxy/3000/api/todos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export default function TodoApp() {
       const todo = todos.find(t => t.id === id);
       if (!todo) return;
 
-      const response = await fetch(`/api/todos/${id}`, {
+      const response = await fetch(`/proxy/3000/api/todos/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export default function TodoApp() {
 
   const handleDeleteTodo = async (id: string) => {
     try {
-      const response = await fetch(`/api/todos/${id}`, {
+      const response = await fetch(`/proxy/3000/api/todos/${id}`, {
         method: 'DELETE',
       });
 
