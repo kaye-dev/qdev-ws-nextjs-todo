@@ -2,8 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  // code-server で開発する際に必要な設定対応
-  assetPrefix: '/proxy/3000',
+  async redirects() {
+    return [
+      {
+        source: '/proxy/3000',
+        destination: '/',
+        permanent: true,
+      },
+    ]
+  },
 };
 
 export default nextConfig;
