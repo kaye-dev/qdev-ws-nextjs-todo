@@ -94,9 +94,6 @@ export class TodoAppStack extends cdk.Stack {
     // ECSサービスの作成（ALB作成後）
     this.ecsService = this.createEcsService();
 
-    // 共通タグの設定
-    this.addCommonTags();
-
     // スタック設定の出力
     this.addStackOutputs();
   }
@@ -194,24 +191,6 @@ export class TodoAppStack extends cdk.Stack {
   }
 
   /**
-   * 共通タグを追加
-   */
-  private addCommonTags(): void {
-    const tags = {
-      Application: this.appName,
-      ManagedBy: "CDK",
-      Project: "NextJS-Todo-App",
-      Owner: "Development-Team",
-      CostCenter: this.appName,
-      CreatedBy: "AWS-CDK",
-    };
-
-    Object.entries(tags).forEach(([key, value]) => {
-      cdk.Tags.of(this).add(key, value);
-    });
-  }
-
-  /**
    * VPCを作成または既存のVPCを検索
    * ワークショップでのVPC共有のため、コンテキストで制御
    */
@@ -221,33 +200,6 @@ export class TodoAppStack extends cdk.Stack {
     const vpc = ec2.Vpc.fromLookup(this, "DefaultVpc", {
       isDefault: true,
     });
-    return vpc;
-  }
-
-  /**
-   * VPCを作成（従来のメソッドは参考用に残す）
-   */
-  private createVpc(): ec2.Vpc {
-    const vpc = new ec2.Vpc(this, "TodoAppVpc", {
-      vpcName: `${this.appName}-vpc`,
-      ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
-      maxAzs: 2, // 2つのアベイラビリティゾーンを使用
-      subnetConfiguration: [
-        {
-          cidrMask: 24,
-          name: "PublicSubnet",
-          subnetType: ec2.SubnetType.PUBLIC,
-        },
-      ],
-      // インターネットゲートウェイを自動作成
-      natGateways: 0, // NATゲートウェイは不要（パブリックサブネットのみ）
-      enableDnsHostnames: true,
-      enableDnsSupport: true,
-    });
-
-    // VPCにタグを追加
-    cdk.Tags.of(vpc).add("Name", `${this.appName}-vpc`);
-
     return vpc;
   }
 
