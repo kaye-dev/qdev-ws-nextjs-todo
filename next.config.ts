@@ -1,16 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
-  async redirects() {
-    return [
-      {
-        source: '/proxy/3000',
-        destination: '/',
-        permanent: true,
-      },
-    ]
-  },
+  output: "standalone",
+  basePath: "/proxy/3000",
+  assetPrefix: "/proxy/3000",
 };
 
 export default nextConfig;
