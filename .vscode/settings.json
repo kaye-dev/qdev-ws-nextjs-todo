@@ -1,5 +1,6 @@
 {
-  "chat.agent.enabled": false,
+  "chat.disableAIFeatures": false,
+  "editor.minimap.enabled": false,
   "amazonQ.suppressPrompts": {
     "amazonQSessionConfigurationMessage": true,
     "amazonQChatDisclaimer": true,
