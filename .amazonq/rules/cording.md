@@ -53,6 +53,17 @@
 - ビジネスロジックはカスタムフック(`src/hooks/`)に分離
 - 再利用可能なコンポーネントは`src/components/`に配置
 
+### 環境別設定
+
+- `process.env.NODE_ENV`を使用して開発環境と本番環境で動作を切り替える
+- 開発環境専用の設定は`next.config.ts`で条件分岐する
+  - 例: `...(process.env.NODE_ENV === "development" && { basePath: "/proxy/3000" })`
+- API呼び出しパスは環境変数で切り替え可能にする
+  - 開発環境: `/proxy/3000/api/*`
+  - 本番環境: `/api/*`
+- 環境依存の定数はファイル先頭で定義する
+  - 例: `const API_BASE = process.env.NODE_ENV === "development" ? "/proxy/3000" : "";`
+
 ### DynamoDB 操作
 
 - DynamoDB クライアントの初期化は`src/utils/dynamodb.ts`を使用

@@ -2,7 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  basePath: "/proxy/3000",
+  ...(process.env.NODE_ENV === "development" && {
+    basePath: "/proxy/3000",
+  }),
   assetPrefix: "/proxy/3000",
 };
 

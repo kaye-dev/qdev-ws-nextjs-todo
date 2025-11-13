@@ -287,6 +287,22 @@ npm run build      # プロダクションビルド
 npm run start      # プロダクションサーバー起動
 ```
 
+### 開発環境の特殊設定
+
+#### プロキシ設定
+
+開発環境では`/proxy/3000`をベースパスとして使用：
+
+- **next.config.ts**: `basePath`を開発環境のみ適用
+- **API呼び出し**: `process.env.NODE_ENV`で環境判定
+  - 開発: `${API_BASE}/api/todos` → `/proxy/3000/api/todos`
+  - 本番: `${API_BASE}/api/todos` → `/api/todos`
+
+```typescript
+// 環境に応じたAPIベースパスを取得
+const API_BASE = process.env.NODE_ENV === "development" ? "/proxy/3000" : "";
+```
+
 ### AWS へのデプロイ
 
 ```bash

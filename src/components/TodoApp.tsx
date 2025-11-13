@@ -1,9 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Todo } from '../types/todo';
-import TodoForm from './TodoForm';
-import TodoList from './TodoList';
+import { useState, useEffect } from "react";
+import { Todo } from "../types/todo";
+import TodoForm from "./TodoForm";
+import TodoList from "./TodoList";
+
+// 環境に応じたAPIベースパスを取得
+const API_BASE = process.env.NODE_ENV === "development" ? "/proxy/3000" : "";
 
 /**
  * TodoApp - Main container component for the todo application
@@ -16,13 +19,13 @@ export default function TodoApp() {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const response = await fetch('/api/todos');
+        const response = await fetch(`${API_BASE}/api/todos`);
         if (response.ok) {
           const todosData = await response.json();
           setTodos(todosData);
         }
       } catch (error) {
-        console.error('Failed to load initial todos:', error);
+        console.error("Failed to load initial todos:", error);
         setTodos([]);
       } finally {
         setIsLoading(false);
@@ -34,71 +37,73 @@ export default function TodoApp() {
 
   const handleAddTodo = async (text: string) => {
     try {
-      const response = await fetch('/api/todos', {
-        method: 'POST',
+      const response = await fetch(`${API_BASE}/api/todos`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ text }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to add todo');
+        throw new Error(error.error || "Failed to add todo");
       }
 
       const newTodo = await response.json();
-      setTodos(prevTodos => [...prevTodos, newTodo]);
+      setTodos((prevTodos) => [...prevTodos, newTodo]);
     } catch (error) {
-      console.error('Failed to add todo:', error);
+      console.error("Failed to add todo:", error);
       throw error;
     }
   };
   const handleToggleTodo = async (id: string) => {
     try {
-      const todo = todos.find(t => t.id === id);
+      const todo = todos.find((t) => t.id === id);
       if (!todo) return;
 
-      const response = await fetch(`/api/todos/${id}`, {
-        method: 'PATCH',
+      const response = await fetch(`${API_BASE}/api/todos/${id}`, {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ completed: !todo.completed }),
       });
 
       if (response.ok) {
-        setTodos(prevTodos =>
-          prevTodos.map(todo =>
-            todo.id === id
-              ? { ...todo, completed: !todo.completed }
-              : todo
+        setTodos((prevTodos) =>
+          prevTodos.map((todo) =>
+            todo.id === id ? { ...todo, completed: !todo.completed } : todo
           )
         );
       }
     } catch (error) {
-      console.error('Failed to toggle todo:', error);
+      console.error("Failed to toggle todo:", error);
     }
   };
 
   const handleDeleteTodo = async (id: string) => {
     try {
-      const response = await fetch(`/api/todos/${id}`, {
-        method: 'DELETE',
+      const response = await fetch(`${API_BASE}/api/todos/${id}`, {
+        method: "DELETE",
       });
 
       if (response.ok) {
-        setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
+        setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
       }
     } catch (error) {
-      console.error('Failed to delete todo:', error);
+      console.error("Failed to delete todo:", error);
     }
   };
 
   // Show loading state during initial data load
   if (isLoading) {
     return (
-      <div className="text-center py-8 sm:py-12" role="status" aria-live="polite">
+      <div
+        className="text-center py-8 sm:py-12"
+        role="status"
+        aria-live="polite"
+      >
         <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-b-2 border-blue-500 mx-auto"></div>
         <p className="mt-3 text-gray-600 text-sm sm:text-base">読み込み中...</p>
         <span className="sr-only">タスクデータを読み込んでいます</span>
@@ -106,7 +111,9 @@ export default function TodoApp() {
     );
   }
 
-  const completedCount = Array.isArray(todos) ? todos.filter(todo => todo.completed).length : 0;
+  const completedCount = Array.isArray(todos)
+    ? todos.filter((todo) => todo.completed).length
+    : 0;
   const totalCount = Array.isArray(todos) ? todos.length : 0;
   const pendingCount = totalCount - completedCount;
 
@@ -114,7 +121,9 @@ export default function TodoApp() {
     <div className="space-y-6 sm:space-y-8">
       {/* Todo Form */}
       <section aria-labelledby="add-task-heading">
-        <h2 id="add-task-heading" className="sr-only">新しいタスクを追加</h2>
+        <h2 id="add-task-heading" className="sr-only">
+          新しいタスクを追加
+        </h2>
         <TodoForm onAddTodo={handleAddTodo} />
       </section>
 
@@ -123,7 +132,9 @@ export default function TodoApp() {
         className="bg-white rounded-lg shadow-md border border-gray-100 p-4 sm:p-6 transition-all duration-300 hover:shadow-lg hover:border-gray-200"
         aria-labelledby="task-list-heading"
       >
-        <h2 id="task-list-heading" className="sr-only">タスクリスト</h2>
+        <h2 id="task-list-heading" className="sr-only">
+          タスクリスト
+        </h2>
         <TodoList
           todos={Array.isArray(todos) ? todos : []}
           onToggleTodo={handleToggleTodo}
@@ -150,7 +161,9 @@ export default function TodoApp() {
               <span>{completedCount} 個の完了タスク</span>
             </span>
             <span className="text-gray-300">|</span>
-            <span className="font-medium text-gray-700">全 {totalCount} 個のタスク</span>
+            <span className="font-medium text-gray-700">
+              全 {totalCount} 個のタスク
+            </span>
           </div>
 
           {/* Progress bar */}
@@ -158,7 +171,9 @@ export default function TodoApp() {
             <div className="mt-3 w-full max-w-xs mx-auto">
               <div className="flex justify-between text-xs mb-1 text-gray-600">
                 <span>進捗</span>
-                <span className="font-medium">{Math.round((completedCount / totalCount) * 100)}%</span>
+                <span className="font-medium">
+                  {Math.round((completedCount / totalCount) * 100)}%
+                </span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2 shadow-inner">
                 <div
