@@ -66,7 +66,6 @@ project-root/
 ├── .amazonq/              # Amazon Q Developer Rules
 │   └── rules/
 │       ├── cording.md
-│       ├── context-management.md
 │       ├── language.md
 │       ├── workshop.md
 │       └── architecture.md
@@ -294,7 +293,7 @@ npm run start      # プロダクションサーバー起動
 開発環境では`/proxy/3000`をベースパスとして使用：
 
 - **next.config.ts**: `basePath`を開発環境のみ適用
-- **API呼び出し**: `process.env.NODE_ENV`で環境判定
+- **API 呼び出し**: `process.env.NODE_ENV`で環境判定
   - 開発: `${API_BASE}/api/todos` → `/proxy/3000/api/todos`
   - 本番: `${API_BASE}/api/todos` → `/api/todos`
 
