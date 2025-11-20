@@ -174,6 +174,23 @@ kiro-cli chat --agent cost
 - `.kiro/steering/product.md` - プロダクト概要
 - `.kiro/steering/conventions.md` - 開発規約
 
+**エージェントの切り替え:**
+
+セッション中に別のエージェントに切り替えることができます：
+
+```bash
+/agent swap <エージェント名>
+```
+
+例:
+```bash
+# フロントエンド開発中にインフラ実装へ切り替え
+/agent swap cdk
+
+# コードレビューへ切り替え
+/agent swap review
+```
+
 ### 3. デプロイ
 
 初回デプロイする際:
