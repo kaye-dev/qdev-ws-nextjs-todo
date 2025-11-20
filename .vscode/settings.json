@@ -7,5 +7,8 @@
     "amazonQChatDisclaimer": true,
     "amazonQChatPairProgramming": true
   },
-  "kiroAgent.configureMCP": "Enabled"
+  "kiroAgent.configureMCP": "Enabled",
+  "cSpell.words": [
+    "Kiro"
+  ]
 }

@@ -24,7 +24,7 @@ npm install
 
 #### 推奨開発フロー
 
-```
+```text
 1. フロントエンド開発 (frontend)
    ↓
 2. インフラ実装 (cdk)
@@ -47,12 +47,14 @@ kiro-cli chat --agent frontend
 **用途:** UI/機能開発、コンポーネント実装
 
 **機能:**
+
 - Next.js 15 + React 19 + TypeScript に最適化
 - コンポーネント設計とベストプラクティス提案
 - Next.js DevTools MCP による実行時診断
 - フロントエンド開発支援 MCP
 
 **使用例:**
+
 ```bash
 # 新機能追加
 > "Todo に優先度フィールドを追加したい"
@@ -75,6 +77,7 @@ kiro-cli chat --agent cdk
 **用途:** AWS CDK によるインフラコード開発
 
 **機能:**
+
 - AWS CDK によるインフラコード開発に最適化
 - CDK Nag によるセキュリティチェック
 - AWS Well-Architected Framework に準拠
@@ -82,6 +85,7 @@ kiro-cli chat --agent cdk
 - コスト意識を持った実装提案
 
 **使用例:**
+
 ```bash
 # インフラ構築
 > "DynamoDB テーブルにバックアップを設定したい"
@@ -104,6 +108,7 @@ kiro-cli chat --agent review
 **用途:** デプロイ前の品質チェック
 
 **機能:**
+
 - コード品質とベストプラクティスチェック
 - TypeScript 型安全性の検証
 - セキュリティとパフォーマンスの分析
@@ -111,6 +116,7 @@ kiro-cli chat --agent review
 - プロジェクト規約への適合性チェック
 
 **使用例:**
+
 ```bash
 # ファイル単位のレビュー
 > "src/components/TodoApp.tsx をレビューして"
@@ -133,6 +139,7 @@ kiro-cli chat --agent cost
 **用途:** 本番デプロイ時のコスト試算
 
 **機能:**
+
 - AWS 利用料の月額見積もり
 - サービス別コスト内訳（ECS Fargate, ALB, DynamoDB, ECR, CloudWatch）
 - トラフィック別シナリオ分析（Low/Medium/High）
@@ -141,6 +148,7 @@ kiro-cli chat --agent cost
 - AWS Pricing Calculator へのリンク提供
 
 **使用例:**
+
 ```bash
 # 基本的な見積もり
 > "このアプリを AWS にデプロイした場合の月額コストを見積もって"
@@ -160,6 +168,7 @@ kiro-cli chat --agent cost
 **共通リソース:**
 
 すべてのエージェントは以下のプロジェクトドキュメントを参照します：
+
 - `.kiro/steering/structure.md` - プロジェクト構造
 - `.kiro/steering/tech.md` - 技術スタック
 - `.kiro/steering/product.md` - プロダクト概要
@@ -167,7 +176,7 @@ kiro-cli chat --agent cost
 
 ### 3. デプロイ
 
-**初回のみ**
+初回デプロイする際:
 
 ```bash
 npm run cdk:bootstrap
