@@ -1,0 +1,4 @@
+{
+  "chat.defaultModel": "claude-sonnet-4.5",
+  "mcp.loadedBefore": true
+}

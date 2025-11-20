@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "awslabs.cdk-mcp-server": {
+      "url": "",
+      "headers": {},
+      "oauthScopes": ["openid", "email", "profile", "offline_access"],
+      "command": "uvx",
+      "args": ["awslabs.cdk-mcp-server@latest"],
+      "env": {},
+      "timeout": 120000,
+      "disabled": false,
+      "disabledTools": []
+    }
+  }
+}
