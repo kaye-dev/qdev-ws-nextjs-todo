@@ -6,5 +6,6 @@
     "amazonQSessionConfigurationMessage": true,
     "amazonQChatDisclaimer": true,
     "amazonQChatPairProgramming": true
-  }
+  },
+  "kiroAgent.configureMCP": "Disabled"
 }
